@@ -1,0 +1,39 @@
+version: "3.7"
+
+services: 
+
+    # psql:
+    #     build: ./postgres
+    #     container_name: postgres
+    #     restart: always
+    #     expose: 
+    #          - 5432
+
+    # mongo:
+    #     build: ./mongo
+    #     container_name: mongo
+    #     restart: always
+    #     expose: 
+    #         - 27017
+    #     depends_on:
+    #         - psql
+
+    flask:
+        build: ./flask  # Build from the Dockerfile residing in the flask directory.
+        container_name: flask # This is referenced as the upstream in the nginx conf so its important that they match or you will have a 502 error message.
+        restart: always # Always restart the container.
+        environment: # Declare environment variables here, psql connection URI's etc.
+             - APP_NAME=MyFlaskApp
+        expose: 
+             - 8080    # This only exposes ports on the internal container network, not to the outside world: uwsgi will listen on this port. 
+        #   
+            #  - psql
+            #  - mongo
+
+    nginx:
+        build: ./nginx
+        container_name: nginx
+        restart: always
+        ports: 
+            - "80:80"   # This maps the host ports - so host port 80 to container port 80.
+
